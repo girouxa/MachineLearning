@@ -2,7 +2,7 @@ import matplotlib as plt
  
 
 w= [0,1]
-x = [[1,5],[1,4],[1,3],[1,2],[1,1]]
+x = [[1,1],[1,2],[1,3],[1,4],[1,5]]
 y = [2,5,6,8,10]
 
 def hypothesis(w,x):
@@ -40,3 +40,5 @@ def descent(learningRate, w, x, y):
     for i in range(100):
         w = gradientStep1(learningRate,w,x,y)
     return w
+
+descent()
