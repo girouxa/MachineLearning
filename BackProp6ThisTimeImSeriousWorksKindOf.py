@@ -166,64 +166,66 @@ class NeuralNetwork:
         self.errorsubt = errorsubt
         self.errordivis = errordivis
         return
-    def train(self,x,y):
-        self.forward(x)
-        self.backProp(x,y)
-        self.gradientDescent(.03, 5000, x, y)
+    def batchTrain(self,batchSize,xs,ys):
+        x = np.array(np.split(xs, batchSize))
+        y = np.array(np.split(ys, batchSize))
+        self.forward(x.T)
+        self.backProp(x.T, y.T)
+        self.gradientDescent(.03, 5000, x.T, y.T)
+        
+
             
         
           
 
 
-g = NeuralNetwork([3,2,2])
-g.weights = [np.array([[0.1,0.3,0.5],[0.2,0.4,0.6]]), np.array([[0.7,0.9],[0.8,0.1]])]
-g.biases = [np.array([[0.5,0.5]]).T, np.array([[0.5,0.5]]).T]
-x = np.array([[1,4,5]]).T
-y = np.array([[.1,.05]]).T
-g.forward(x)
-g.backProp(x,y)
-print("calculated weight derivatives:")
-print(g.dW)
-print("estimated weight derivatives:")
-print(g.estimateDWeights(x,y,.00001))
-g.gradientTest(g.dW,g.estimateDWeights(x,y,.00001))
-print("sensitivities:")
-print(g.s)
-print("activations:")
-print(g.activations)
-print("zs:")
-print(g.zs)
-print("division:")
-print(g.errordivis)
-print("subt:")
-print(g.errorsubt)
-print(" ")
-print("cost at first:")
-print(g.cost(x,y))
-print("cost after descent:")
-g.gradientDescent(.01, 10000,x, y)
-print(g.cost(x,y))
-#nn = NeuralNetwork([1,5,5,1])
-#
-#xtrain = np.array(np.arange(0,10,1)).reshape(-1, 1)
-#xtest = np.array(np.arange(-5,15,0.1)).reshape(-1, 1)
-#ytrain = np.sin(xtrain)
-#print(xtrain.T)
-#nn.forward(xtrain)
-#print(nn.weights)
-#
-#
-#history = nn.train(xtrain, ytrain)
-#
-#plt.plot(history)
-#plt.show()
-#
-#ytest = nn.predict(xtest.T)
-#plt.scatter(xtest.flatten(), ytest.flatten())
-#plt.scatter(xtrain.flatten(), ytrain.flatten())
-#plt.xlim(-5, 15)
-#plt.ylim(-1.2, 1.2)
-#plt.show()
+#g = NeuralNetwork([3,2,2])
+#g.weights = [np.array([[0.1,0.3,0.5],[0.2,0.4,0.6]]), np.array([[0.7,0.9],[0.8,0.1]])]
+#g.biases = [np.array([[0.5,0.5]]).T, np.array([[0.5,0.5]]).T]
+#x = np.array([[1,4,5]]).T
+#y = np.array([[.1,.05]]).T
+#g.forward(x)
+#g.backProp(x,y)
+#print("calculated weight derivatives:")
+#print(g.dW)
+#print("estimated weight derivatives:")
+#print(g.estimateDWeights(x,y,.00001))
+#g.gradientTest(g.dW,g.estimateDWeights(x,y,.00001))
+#print("sensitivities:")
+#print(g.s)
+#print("activations:")
+#print(g.activations)
+#print("zs:")
+#print(g.zs)
+#print("division:")
+#print(g.errordivis)
+#print("subt:")
+#print(g.errorsubt)
+#print(" ")
+#print("cost at first:")
+#print(g.cost(x,y))
+#print("cost after descent:")
+#g.gradientDescent(.01, 10000,x, y)
+#print(g.cost(x,y))
+nn = NeuralNetwork([1,5,5,1])
+
+xtrain = np.array(np.arange(0,10,1)).reshape(-1, 1)
+xtest = np.array(np.arange(-5,15,0.1)).reshape(-1, 1)
+ytrain = np.sin(xtrain)
+nn.batchTrain(1, xtrain.T, ytrain.T)
+
+
+history = nn.train(xtrain, ytrain)
+
+plt.plot(history)
+plt.show()
+
+ytest = nn.predict(xtest.T)
+plt.scatter(xtest.flatten(), ytest.flatten())
+plt.scatter(xtrain.flatten(), ytrain.flatten())
+plt.xlim(-5, 15)
+plt.ylim(-1.2, 1.2)
+plt.show()
 
 #print(g.activations)
 #print(g.activationDer(g.zs[1]))
