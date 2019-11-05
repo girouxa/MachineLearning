@@ -26,6 +26,8 @@ def genBiases(num, nodes):
     a = []
     for i in range(num-1):
         a.append(2 * np.random.random_sample((nodes[i+1],1)) - 1)
+    print("a:")
+    print(a)
     return a
   
 def value_at(shape, row, col, value):
@@ -36,6 +38,13 @@ def value_at(shape, row, col, value):
 # return copy of original array with delta added to the row,col element
 def delta_at(a, row, col, delta):
   return a + value_at(a.shape, row, col, delta)
+
+def oneDToTwoD(x):
+  xfin = []
+  for i in range(len(x)):
+    xfin.append([])
+    xfin[i].append(x[0])
+  return np.asarray(xfin)
 
 class NeuralNetwork:
     def __init__(self, n):
@@ -118,7 +127,6 @@ class NeuralNetwork:
         self.zs = []
         self.activations = []
         currentm = self.weights[0]
-        print(currentm)
         sec = x
         for i in range(len(self.nodes)-1):
             weighted = currentm.dot(sec) + self.biases[i]
@@ -151,12 +159,10 @@ class NeuralNetwork:
         self.dB = s
         self.s = s
         return
-    def gradientDescent(self, learningRate, num,x,  y):
-        for r in range(num):
-            for u in range(len(self.dB)):
-                self.weights[u] -= learningRate*self.dW[u]
-                self.biases[u] -= learningRate*self.dB[u]
-                self.backProp(x, y)
+    def update(self, learningRate, x,  y):
+        for u in range(len(self.s)):
+            self.weights[u] -= learningRate*self.dW[u]
+            self.biases[u] -= learningRate*self.dB[u]
     def gradientTest(self, e, c):
         errorsubt = []
         errordivis = []
@@ -166,12 +172,20 @@ class NeuralNetwork:
         self.errorsubt = errorsubt
         self.errordivis = errordivis
         return
-    def batchTrain(self,batchSize,xs,ys):
-        x = np.array(np.split(xs, batchSize))
-        y = np.array(np.split(ys, batchSize))
+    def gradientDescent(self, learningRate, x, y):
         self.forward(x.T)
-        self.backProp(x.T, y.T)
-        self.gradientDescent(.03, 5000, x.T, y.T)
+        self.backProp(x.T,y.T)
+        self.update(.03, x, y)
+    def batchTrain(self,batchSize,xs,ys):
+        x = np.split(xs[0], len(xs[0])/batchSize)
+        y = np.split(ys[0], len(xs[0])/batchSize)
+        x = oneDToTwoD(x)
+        y = oneDToTwoD(y)
+        for t in range(len(x)):
+            self.gradientDescent(.03, x[t], y[t])
+        
+            
+
         
 
             
@@ -212,10 +226,12 @@ nn = NeuralNetwork([1,5,5,1])
 xtrain = np.array(np.arange(0,10,1)).reshape(-1, 1)
 xtest = np.array(np.arange(-5,15,0.1)).reshape(-1, 1)
 ytrain = np.sin(xtrain)
-nn.batchTrain(1, xtrain.T, ytrain.T)
+#nn.batchTrain(1, xtrain, ytrain)
+#print(nn.dW)
+#print(nn.estimateDWeights(oneDToTwoD(xtrain), oneDToTwoD(ytrain), .00001))
 
 
-history = nn.train(xtrain, ytrain)
+history = nn.batchTrain(1, xtrain, ytrain)
 
 plt.plot(history)
 plt.show()

@@ -175,10 +175,10 @@ class NeuralNetwork:
           
 
 
-g = NeuralNetwork([3,2,2])
-g.weights = [np.array([[0.1,0.3,0.5],[0.2,0.4,0.6]]), np.array([[0.7,0.9],[0.8,0.1]])]
-g.biases = [np.array([[0.5,0.5]]).T, np.array([[0.5,0.5]]).T]
-x = np.array([[1,4,5]]).T
+g = NeuralNetwork([1,2,2])
+#g.weights = [np.array([[0.1,0.3,0.5],[0.2,0.4,0.6]]), np.array([[0.7,0.9],[0.8,0.1]])]
+#g.biases = [np.array([[0.5,0.5]]).T, np.array([[0.5,0.5]]).T]
+x = np.array([[5]]).T
 y = np.array([[.1,.05]]).T
 g.forward(x)
 g.backProp(x,y)
