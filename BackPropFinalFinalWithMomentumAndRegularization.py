@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 28 09:26:34 2019
+Created on Sat Nov 16 12:22:43 2019
 
 @author: Annie
 """
+
+
+
+
+
+
 
 
 import numpy as np
@@ -58,6 +64,8 @@ class NeuralNetwork:
         self.s  = None
         self.errorsubt = None
         self.errordivis = None
+        self.vdw = [np.zeros_like(w) for w in self.weights]
+        self.vdb = [np.zeros_like(b) for b in self.biases]
         pass
     def activation(self, x, relu):
         if(relu):
@@ -107,9 +115,9 @@ class NeuralNetwork:
                 for c in range(cols):
                     tw = self.weights[layer] # make a backup of the weights matrix
                     self.weights[layer] = delta_at(tw, r, c, epsilon)
-                    c1 = self.cost(x,y)
+                    c1 = self.cost(x,y, .0001)
                     self.weights[layer] = delta_at(tw, r, c, -epsilon)
-                    c2 = self.cost(x,y)
+                    c2 = self.cost(x,y, .0001)
                     self.weights[layer] = tw # restore the backup
                     dc = (c1-c2)/(2*epsilon)
                     dw[layer][r,c] = dc
@@ -123,9 +131,9 @@ class NeuralNetwork:
                 for c in range(cols):
                     tb = self.biases[layer] # make a backup of the bias matrix
                     self.biases[layer] = delta_at(tb, r, c, epsilon)
-                    c1 = self.cost(x,y)
+                    c1 = self.cost(x,y, .0001)
                     self.biases[layer] = delta_at(tb, r, c, -epsilon)
-                    c2 = self.cost(x,y)
+                    c2 = self.cost(x,y, .0001)
                     self.biases[layer] = tb # restore the backup
                     dc = (c1-c2)/(2*epsilon)
                     db[layer][r,c] = dc
@@ -138,14 +146,21 @@ class NeuralNetwork:
         for i in range(len(self.nodes)-1):
             weighted = currentm.dot(sec) + self.biases[i]
             self.zs.append(weighted)
-            sec = self.activation(np.array(weighted, dtype = np.float64), True)
-            self.activations.append(np.asarray(sec));
+            if(i == (len(self.nodes)-2)):
+              self.activations.append(np.asarray(weighted))
+              return weighted
+            else:
+              sec = self.activation(np.array(weighted, dtype = np.float64), True)
+              self.activations.append(np.asarray(sec));
             if(i == (len(self.nodes)-2)):
                 return sec
             else:
                 currentm = self.weights[i+1]
-    def cost(self,x, y):
-        return np.mean((1/2)*(np.sum(np.square(self.forward(x)-y), axis=0)))
+    def cost(self,x, y, lam):
+        reg = 0
+        for i in range(len(self.nodes)-1):
+          reg += np.sum(np.square(self.weights[i]))
+        return np.mean((1/2)*(np.sum(np.square(self.forward(x)-y), axis=0))) + (lam/2*y.shape[1])
     def backProp(self,x, y):
         self.forward(x)
         layer = (len(self.weights) - 1)
@@ -168,10 +183,12 @@ class NeuralNetwork:
         self.dW = dW
         self.s = s
         return
-    def update(self, learningRate):
+    def update(self, learningRate, bet):
         for u in range(len(self.weights)):
-            self.weights[u] -= learningRate*self.dW[u]
-            self.biases[u] -= learningRate*self.dB[u]
+            self.vdw[u] = bet*self.vdw[u] + (1-bet)*self.dW[u]
+            self.vdb[u] = bet*self.vdb[u] + (1-bet)*self.dB[u]
+            self.weights[u] = self.weights[u] - (learningRate*self.vdw[u])
+            self.biases[u] = self.biases[u] - (learningRate*self.vdb[u])
     def gradientTest(self, e, c):
         errorsubt = []
         errordivis = []
@@ -184,7 +201,7 @@ class NeuralNetwork:
     def gradientDescent(self, learningRate, x, y):
         self.forward(x.T)
         self.backProp(x.T,y.T)
-        self.update(.03, x, y)
+        self.update(.03, 0.9)
     def fit(self, batchSize, epochs, learningRate, xs, ys):
         costs = []
         if batchSize == 0:
@@ -194,9 +211,9 @@ class NeuralNetwork:
             i = 0
             while i < xs.shape[1]:
                 self.backProp(xs[:,i:i+batchSize], ys[:,i:i+batchSize])
-                self.update(learningRate)
+                self.update(learningRate, 0.9)
                 i += batchSize
-            costs.append(self.cost(xs,ys))
+            costs.append(self.cost(xs,ys, .0001))
         return costs
 #        x = np.split(xs[0], len(xs[0])/batchSize)
 #        y = np.split(ys[0], len(xs[0])/batchSize)

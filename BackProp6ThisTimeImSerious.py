@@ -205,25 +205,25 @@ g.gradientDescent(.01, 10000,x, y)
 print(g.cost(x,y))
 #nn = NeuralNetwork([1,5,5,1])
 #
-#xtrain = np.array(np.arange(0,10,1)).reshape(-1, 1)
-#xtest = np.array(np.arange(-5,15,0.1)).reshape(-1, 1)
-#ytrain = np.sin(xtrain)
-#print(xtrain.T)
-#nn.forward(xtrain)
-#print(nn.weights)
-#
-#
-#history = nn.train(xtrain, ytrain)
-#
-#plt.plot(history)
-#plt.show()
-#
-#ytest = nn.predict(xtest.T)
-#plt.scatter(xtest.flatten(), ytest.flatten())
-#plt.scatter(xtrain.flatten(), ytrain.flatten())
-#plt.xlim(-5, 15)
-#plt.ylim(-1.2, 1.2)
-#plt.show()
+xtrain = np.array(np.arange(0,10,1)).reshape(-1, 1)
+xtest = np.array(np.arange(-5,15,0.1)).reshape(-1, 1)
+ytrain = np.sin(xtrain)
+print(xtrain.T)
+nn.forward(xtrain)
+print(nn.weights)
+
+
+history = nn.train(xtrain, ytrain)
+
+plt.plot(history)
+plt.show()
+
+ytest = nn.predict(xtest.T)
+plt.scatter(xtest.flatten(), ytest.flatten())
+plt.scatter(xtrain.flatten(), ytrain.flatten())
+plt.xlim(-5, 15)
+plt.ylim(-1.2, 1.2)
+plt.show()
 
 #print(g.activations)
 #print(g.activationDer(g.zs[1]))
